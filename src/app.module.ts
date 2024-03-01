@@ -8,7 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
-    OrderModule, 
+    OrderModule,  
     UserModule, 
     ProductModule,
     ConfigModule.forRoot({
