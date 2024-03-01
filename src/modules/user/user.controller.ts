@@ -1,26 +1,46 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
-import { CreateUserDTO } from './dto/create-user.dto';
-import { UserService } from './user.service';
-import { FindAllUsersDTO } from './dto/find-all-users.dto';
+import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common";
+import { CreateUserDTO } from "./dto/create-user.dto";
+import { UserService } from "./user.service";
+import { FindUserDTO } from "./dto/find-user.dto";
+import { UpdateUserDTO } from "./dto/update-user.dto";
 
-@Controller('user')
+@Controller("user")
 export class UserController {
-    constructor(private readonly userService: UserService){}
+  constructor(private readonly userService: UserService) {}
 
-    @Post()
-    async createUser(@Body() createUser: CreateUserDTO){
-        const newUser = this.userService.createUser(createUser)
+  @Post()
+  async createUser(@Body() createUser: CreateUserDTO) {
+    const newUser = this.userService.createUser(createUser);
 
-        return {
-            user: new FindAllUsersDTO((await newUser).id, (await newUser).name),
-            message: 'Usuário criado com sucesso.'
-        }
+    return {
+      user: new FindUserDTO((await newUser).id, (await newUser).name),
+      message: "Usuário criado com sucesso.",
+    };
+  }
+
+  @Get()
+  async findAllUsers() {
+    const allUsersList: FindUserDTO[] =
+      await this.userService.findAllUsers();
+    return allUsersList;
+  }
+
+  @Put('/:id')
+  async updateUser(
+    @Param('id') id: string,
+    @Body() updatedData: UpdateUserDTO
+  ){
+    await this.userService.updateUser(id, updatedData)
+
+    return {
+        user: new FindUserDTO(id, updatedData.name),
+        message: 'Usuário atualizado com sucesso.'
     }
+  }
 
-    @Get()
-    async findAllUsers(){
-        console.log('controler')
-        const allUsersList: FindAllUsersDTO[] = await this.userService.findAllUsers();
-        return allUsersList
-    }
+  @Delete('/:id')
+  async deleteUser(@Param('id') id:string){
+    await this.userService.deleteUser(id)
+    return 'Usuário deletado com sucesso.'
+  }
 }
